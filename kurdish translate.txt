@@ -1,0 +1,66 @@
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+
+export default function TranslatorApp() {
+  const [text, setText] = useState("");
+  const [result, setResult] = useState("");
+  const [mode, setMode] = useState("ku-en");
+
+  const translateText = async () => {
+    const response = await fetch("https://api.mymemory.translated.net/get?q=" + encodeURIComponent(text) + "&langpair=" + (mode === "ku-en" ? "ku|en" : "en|ku"));
+    const data = await response.json();
+    setResult(data.responseData.translatedText);
+  };
+
+  return (
+    <div className="min-h-screen bg-black text-white p-4 flex flex-col items-center justify-center gap-6">
+      <h1 className="text-3xl font-bold">Kurdish ↔ English Translator</h1>
+      <Tabs value={mode} onValueChange={setMode}>
+        <TabsList>
+          <TabsTrigger value="ku-en">Kurdish → English</TabsTrigger>
+          <TabsTrigger value="en-ku">English → Kurdish</TabsTrigger>
+        </TabsList>
+        <TabsContent value="ku-en">
+          <Card className="bg-zinc-900 text-white w-full max-w-2xl">
+            <CardContent className="p-4">
+              <Textarea
+                placeholder="Write in Kurdish..."
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                className="mb-4"
+              />
+              <Button onClick={translateText} className="mb-4 w-full">Translate</Button>
+              <Textarea
+                placeholder="Translation..."
+                value={result}
+                readOnly
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="en-ku">
+          <Card className="bg-zinc-900 text-white w-full max-w-2xl">
+            <CardContent className="p-4">
+              <Textarea
+                placeholder="Write in English..."
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                className="mb-4"
+              />
+              <Button onClick={translateText} className="mb-4 w-full">Translate</Button>
+              <Textarea
+                placeholder="Translation..."
+                value={result}
+                readOnly
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
